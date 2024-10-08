@@ -1,68 +1,85 @@
 <script>
+import { reactive, watch } from 'vue';
+
+const valor = reactive({
+  numero1: 0,
+  numero2: 0,
+  operacao: "soma",
+  resultado: 0,
+});
+
+// Função para realizar o cálculo com base na operação selecionada
+function calcular() {
+  if (valor.operacao === "soma") {
+    valor.resultado = valor.numero1 + valor.numero2;
+  } else if (valor.operacao === "subtracao") {
+    valor.resultado = valor.numero1 - valor.numero2;
+  } else if (valor.operacao === "multiplicacao") {
+    valor.resultado = valor.numero1 * valor.numero2;
+  } else if (valor.operacao === "divisao") {
+    valor.resultado = valor.numero2 !== 0 ? valor.numero1 / valor.numero2 : "Erro: Divisão por zero"; //'Divisão por zero não é permitida';
+  }
+}
+
+// Criar um watcher para observar mudanças e calcular automaticamente
+watch([() => valor.numero1, () => valor.numero2, () => valor.operacao], calcular);
+
 export default {
-  data() {
-    return {
-      numero1: 0,
-      numero2: 0,
-      operacao: "soma",
-    };
-  },
-  computed: {
-    resultado() {
-      switch (this.operacao) {
-        case "soma":
-          return this.numero1 + this.numero2;
-        case "subtracao":
-          return this.numero1 - this.numero2;
-        case "multiplicacao":
-          return this.numero1 * this.numero2;
-        case "divisao":
-          return this.numero2 !== 0 ? (this.numero1 / this.numero2).toFixed(2) : "Erro: Divisão por zero";
-        default:
-          return 0;
-      }
-    },
-  },
+  setup() {
+    return { valor }; // Retorna os dados reativos para o template
+  }
 };
 </script>
 
-
 <template>
-  <div class="container mt-5">
-    <div class="card p-4">
-      <h2 class="text-center mb-4">Calculadora Aritmética</h2>
-      <div class="form-group">
-        <label for="numero1">Número 1:</label>
-        <input v-model.number="numero1" type="number" class="form-control" placeholder="Insira o primeiro número" />
-      </div>
+  <div class="container mt-4">
+    <header>
+      <h1>Calculadora Aritmética</h1>
+    </header>
 
-      <div class="form-group">
-        <label for="numero2">Número 2:</label>
-        <input v-model.number="numero2" type="number" class="form-control" placeholder="Insira o segundo número" />
+    <form>
+      <div class="row">
+        <!-- Campos de input para os números -->
+        <div class="col-3">
+          <input
+            class="form-control mb-2"
+            v-model.number="valor.numero1"
+            type="number"
+            placeholder="Digite o primeiro número"
+          />
+          <input
+            class="form-control mb-2"
+            v-model.number="valor.numero2"
+            type="number"
+            placeholder="Digite o segundo número"
+          />
+        </div>
+
+        <!-- Seletor de operações -->
+        <div class="col-2">
+          <select v-model="valor.operacao" class="form-control">
+            <option value="soma">Somar</option>
+            <option value="subtracao">Subtrair</option>
+            <option value="multiplicacao">Multiplicar</option>
+            <option value="divisao">Dividir</option>
+          </select>
+        </div>
+
+        <!-- Exibição do resultado -->
+        <div class="col-12">
+          <h4 class="text-center mt-4">Resultado: {{ valor.resultado }}</h4>
+        </div>
       </div>
-      
-      <div class="form-group">
-        <label for="operacao">Operação:</label>
-        <select v-model="operacao" class="form-control">
-          <option value="soma">Somar</option>
-          <option value="subtracao">Subtrair</option>
-          <option value="multiplicacao">Multiplicar</option>
-          <option value="divisao">Dividir</option>
-        </select>
-      </div>
-      <h4 class="text-center mt-4">Resultado: {{ resultado }}</h4>
-    </div>
+    </form>
   </div>
 </template>
 
-
-
 <style scoped>
 .container {
-  max-width: 500px;
+  max-width: 600px;
 }
-
-h2, h4 {
-  color: #333;
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 </style>
